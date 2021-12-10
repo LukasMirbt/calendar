@@ -503,11 +503,12 @@ class _TableCalendarState<T> extends State<TableCalendar<T>> {
             weekNumbersVisible: widget.weekNumbersVisible,
             weekNumberBuilder: (BuildContext context, DateTime day) {
               final weekNumber = isoWeekNumber(day);
-              Widget? cell =
-                  widget.calendarBuilders.weekNumberBuilder?.call(context, weekNumber);
+              Widget? cell = widget.calendarBuilders.weekNumberBuilder
+                  ?.call(context, weekNumber);
 
               if (cell == null) {
                 cell = Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   alignment: Alignment.center,
                   child: Text(
                     weekNumber.toString(),
@@ -558,13 +559,15 @@ class _TableCalendarState<T> extends State<TableCalendar<T>> {
 
   int isoWeekNumber(DateTime date) {
     int daysToAdd = DateTime.thursday - date.weekday;
-    DateTime thursdayDate = daysToAdd > 0 ? date.add(Duration(days: daysToAdd)) : date.subtract(Duration(days: daysToAdd.abs()));
+    DateTime thursdayDate = daysToAdd > 0
+        ? date.add(Duration(days: daysToAdd))
+        : date.subtract(Duration(days: daysToAdd.abs()));
     int dayOfYearThursday = dayOfYear(thursdayDate);
     return 1 + ((dayOfYearThursday - 1) / 7).floor();
   }
 
   int dayOfYear(DateTime date) {
-      return date.difference(DateTime(date.year, 1, 1)).inDays;
+    return date.difference(DateTime(date.year, 1, 1)).inDays;
   }
 
   Widget _buildCell(DateTime day, DateTime focusedDay) {

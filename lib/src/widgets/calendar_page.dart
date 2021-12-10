@@ -26,50 +26,29 @@ class CalendarPage extends StatelessWidget {
     this.weekNumberVisible = false,
     this.dowHeight,
   })  : assert(!dowVisible || dowBuilder != null),
+        assert(!weekNumberVisible || weekNumberBuilder != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Table(
       children: [
-        if (weekNumberVisible)
-          _buildWeekNumbers(context),
-        Expanded(
-          child: Table(
-            children: [
-              if (dowVisible) _buildDaysOfWeek(context),
-              ..._buildCalendarDays(context),
-            ],
-          ),
-        ),
+        if (dowVisible) _buildDaysOfWeek(context),
+        ..._buildCalendarDays(context),
       ],
-    );
-  }
-  
-  Widget _buildWeekNumbers(BuildContext context) {
-    final rowAmount = visibleDays.length ~/ 7;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Column(
-        children: [
-          if (dowVisible)
-            SizedBox(height: dowHeight ?? 0),
-          ...List.generate(rowAmount, (index) => index * 7)
-            .map((index) => weekNumberBuilder!(context, visibleDays[index]))
-            .toList()
-        ],
-      ),
     );
   }
 
   TableRow _buildDaysOfWeek(BuildContext context) {
     return TableRow(
       decoration: dowDecoration,
-      children: List.generate(
-        7,
-        (index) => dowBuilder!(context, visibleDays[index]),
-      ).toList(),
+      children: [
+        if (weekNumberVisible && dowVisible) SizedBox(height: dowHeight ?? 0),
+        ...List.generate(
+          7,
+          (index) => dowBuilder!(context, visibleDays[index]),
+        )
+      ].toList(),
     );
   }
 
@@ -79,10 +58,14 @@ class CalendarPage extends StatelessWidget {
     return List.generate(rowAmount, (index) => index * 7)
         .map((index) => TableRow(
               decoration: rowDecoration,
-              children: List.generate(
-                7,
-                (id) => dayBuilder(context, visibleDays[index + id]),
-              ),
+              children: [
+                if (weekNumberVisible)
+                  weekNumberBuilder!(context, visibleDays[index + 1]),
+                ...List.generate(
+                  7,
+                  (id) => dayBuilder(context, visibleDays[index + id]),
+                )
+              ],
             ))
         .toList();
   }
